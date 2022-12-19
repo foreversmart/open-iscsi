@@ -2,6 +2,9 @@
 # Makefile for the Open-iSCSI Initiator
 #
 
+# Image URL to use all building/pushing image targets
+IMG ?=docker.qiniu.io:32500/open-iscsi:latest
+
 # if you are packaging open-iscsi, set this variable to the location
 # that you want everything installed into.
 DESTDIR ?=
@@ -51,6 +54,17 @@ all: user
 
 make_utils:
 	$(MAKE) $(MFLAGS) -C utils
+
+.PHONY: docker-build
+docker-build: build ## Build docker image with the manager.
+	docker build -t ${IMG} .
+
+.PHONY: docker-push
+docker-push: ## Push docker image with the manager.
+	docker push ${IMG}
+
+.PHONY: deploy
+deploy: docker-build docker-push
 
 deprecation_msg:
 	@echo "***"
